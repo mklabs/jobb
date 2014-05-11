@@ -4,15 +4,21 @@
   "description": "API to generate CI job configuration (Jenkins)",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "pretest": "npm run lint",
+    "test": "mocha --reporter spec",
+    "lint": "jshint index.js lib/",
+    "docs": "mocha --reporter markdown >> readme.md"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "mocha": "^1.18.2"
+    "mocha": "^1.18.2",
+    "jshint": "^2.5.0"
   },
   "dependencies": {
     "xml2js": "^0.4.2",
-    "propo": "0.0.1"
+    "propo": "0.0.1",
+    "underscore": "^1.6.0",
+    "xmlbuilder": "^2.2.1"
   }
 }

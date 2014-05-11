@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project>
+  <description>A optionnaly rendered to **markdown** description</description>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>PERF_URLS</name>
+          <description>bla bla</description>
+          <defaultValue>default value</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H/30 * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo Some script
+echo Second line
+echo etc
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+echo 3;
+echo 4;
+echo 5;
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+</project>

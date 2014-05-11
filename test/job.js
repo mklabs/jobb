@@ -1,7 +1,16 @@
+var fs     = require('fs');
+var path   = require('path');
+var assert = require('assert');
+
+var read = fs.readFileSync;
+var write = fs.writeFileSync;
+
+var fixtures = path.join(__dirname, 'fixtures');
 
 describe('Job', function() {
 
-  var job = require('..');
+  var Job = require('..');
+  var example = Job('name', 'Jenkins');
 
   it('job()', function() {
 
@@ -10,8 +19,7 @@ describe('Job', function() {
     // - required args, positional argument, in order of importance.
     // - optional: Uses last arg options Hash
 
-
-    job('name')
+    example
       .description('A optionnaly rendered to **markdown** description')
 
       // Params
@@ -42,8 +50,7 @@ describe('Job', function() {
       //
       // Scripts must set the proper shebang line
 
-      .file('./script.js')
-      .file('./script.sh')
+      .file('./test/fixtures/file.sh')
 
       // Publishers
       //
@@ -81,6 +88,80 @@ describe('Job', function() {
         condition: 'ALWAYS'
       });
 
+
+    console.error(example.inspect(2));
+  });
+
+
+  it('Job name required', function(done) {
+    try {
+      Job();
+    } catch(e) {
+      assert.equal(e.message, 'Job - Missing name');
+      done();
+    }
+  });
+
+  it('job#json', function() {
+    var job = Job('name');
+    var data = { bar: 'foo' };
+    var orig = { bar: 'foo' };
+    job.json('foo', data);
+
+    data.refcheck = true;
+
+    assert.deepEqual(job.json('foo'), {
+      name: 'foo',
+      desc: '',
+      data: orig
+    });
+
+    job.json('foo', 'desc', {});
+
+    assert.deepEqual(job.json('foo'), {
+      name: 'foo',
+      desc: 'desc',
+      data: {}
+    });
+
+    assert.ok(job.json('foo'));
+  });
+
+  it('job#param', function() {
+    var job = Job('name');
+
+    job.param('foo', {});
+
+    assert.deepEqual(job.param('foo'), {
+      name: 'foo',
+      description: '',
+      value: ''
+    });
+
+    assert.ok(job.param('foo'));
+  });
+
+  it('job#script', function() {
+    var job = Job('name');
+    job.script('echo 1;', 'echo 2;', 'echo 3;')
+    assert.equal(job.attributes.scripts[0], 'echo 1;\necho 2;\necho 3;\n');
+  });
+
+  it('job#file', function() {
+    var job = Job('name');
+    var file = path.join(fixtures, 'file.sh');
+    job.file(file);
+
+    assert.equal(job.attributes.scripts[0], read(file, 'utf8'));
+  });
+
+  describe('XML', function() {
+
+    it('Job#xml', function() {
+      var xml = example.xml();
+      console.error(xml);
+      write(path.join(fixtures, 'test.xml'), xml);
+    });
   });
 
 });
