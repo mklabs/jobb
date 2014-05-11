@@ -1,0 +1,18 @@
+{
+  "name": "job",
+  "version": "0.0.0",
+  "description": "API to generate CI job configuration (Jenkins)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^1.18.2"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.2",
+    "propo": "0.0.1"
+  }
+}
