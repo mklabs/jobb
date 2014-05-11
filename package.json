@@ -1,6 +1,6 @@
 {
   "name": "jobb",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "API to generate CI job configuration (Jenkins)",
   "bin": "bin/job",
   "main": "index.js",
