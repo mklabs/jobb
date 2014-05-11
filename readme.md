@@ -1,7 +1,9 @@
 
 # jobb
 
-> Blah
+API to generate CI job configuration (Jenkins for now)
+
+> wip
 
 
 # TOC

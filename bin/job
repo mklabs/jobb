@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+var debug = console.error.bind(console);
+var out = console.log.bind(console);
+
+var program = require('commander');
+var fs     = require('fs');
+var path   = require('path');
+var assert = require('assert');
+
+var read = fs.readFileSync;
+var write = fs.writeFileSync;
+var exists = fs.existsSync;
+
+var Job = require('..');
+
+// jobb ./foo --description "Job description" --config ./config.json
+
+program
+  .option('-n, --name [name]', 'Job name')
+  .option('-d, --desc [desc]', 'Job description')
+  .option('-t, --timer [timer]', 'Timer cron value');
+  // .option('-j, --jenkins [jenkinsURL]', 'URL of a remote jenkins where you have permission to /createItem')
+
+program.parse(process.argv);
+
+if (program.config && !exists(program.config)) throw new Error('Cant load ' + program.config);
+
+var dir = path.resolve(program.args[0] || './');
+
+debug('Dir: %s', dir);
+
+// TODO:
+//
+// - Handle URL & Git clone, fetching the template locally in a local
+// dir first
+
+// Lookup files
+
+var files = fs.readdirSync(dir);
+debug('%d files', files.length);
+
+var scripts = files.filter(function(file) {
+  return /\.(js|sh|rb|coffee)$/g.test(file);
+}).map(function(file) {
+  return path.join(dir, file);
+});
+
+debug('%d scripts', scripts.length);
+
+var markdown = files.filter(function(file) {
+  return /\.(md|.markdown|.mkd)$/.test(file);
+});
+
+var config = files.filter(function(file) {
+  if (!/\.json$/.test(file)) return;
+  return exists(path.join(dir, file));
+}).map(function(file) {
+  return require(path.resolve(dir, file));
+}).reduce(function(res, conf) {
+  Object.keys(conf).forEach(function(key) {
+    res[key] = conf[key];
+  });
+
+  return res;
+}, {});
+
+debug('Config', config);
+
+// Job
+
+var job = Job(program.name || 'Jobb');
+
+job.description(program.description);
+job.timer(program.timer);
+
+scripts.forEach(job.file.bind(job));
+
+if (Array.isArray(config.params)) config.params.forEach(function(conf) {
+  if (!conf.name) throw new Error('Param required name missing');
+  job.param(conf.name, conf);
+});
+
+
+out(job.xml());
